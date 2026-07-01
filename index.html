@@ -5,233 +5,313 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Screen Time Bypass</title>
     <style>
-        body { 
-            font-family: 'Helvetica Neue', Arial, sans-serif; 
+        :root {
+            --panel-bg: rgba(12, 17, 34, 0.85);
+            --nebula-purple: #4b1b7f;
+            --cosmic-blue: #0088cc;
+            --text-color: #e0e5ff;
+            --url-color: #8fa0cc;
+            --alert-red: #d94141;
+        }
+
+        html, body {
             margin: 0;
-            padding: 40px 20px; 
-            color: #e2e8f0;
-            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #311042, #0f172a);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            padding: 0;
             min-height: 100vh;
+            width: 100%;
+        }
+
+        body {
+            color: var(--text-color);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             box-sizing: border-box;
+            
+            /* 深宇宙のベースグラデーション */
+            background: linear-gradient(135deg, #05020f 0%, #010003 100%) no-repeat fixed;
             position: relative;
             overflow-x: hidden;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        #starfield {
+        /* 自由な浮遊運動を作るための星空レイヤー */
+        body::before, body::after {
+            content: "";
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
+            top: -30%; left: -30%; width: 160%; height: 160%;
+            background-color: transparent;
+            z-index: -1;
             pointer-events: none;
         }
 
-        .container { 
-            position: relative;
-            z-index: 1;
-            max-width: 500px; 
-            margin: 0 auto; 
-            background: rgba(15, 23, 42, 0.65); 
-            padding: 30px; 
-            border-radius: 16px; 
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5); 
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(12px);
+        /* レイヤー1: 手前の大きな星（大きな軌道で不規則に回転・浮遊） */
+        body::before {
+            background-image: radial-gradient(circle, #ffffff 2.5px, transparent 2.5px);
+            background-size: 280px 280px;
+            opacity: 0.6;
+            /* 回転と移動のスピードを変えて組み合わせ、予測不能な動きにする */
+            animation: cosmicFloat1 25s ease-in-out infinite alternate, cosmicRotate 50s linear infinite;
         }
 
-        h1 { font-size: 26px; text-align: center; color: #fff; margin-top: 0; margin-bottom: 25px; font-weight: 800; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        
-        input[type="text"] { 
-            width: 100%; 
-            padding: 12px; 
-            margin-bottom: 14px; 
-            box-sizing: border-box; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 6px; 
-            background: rgba(15, 23, 42, 0.8);
+        /* レイヤー2: 奥の小さな星（小さな軌道で細かく浮遊） */
+        body::after {
+            background-image: radial-gradient(circle, rgba(255,255,255,0.8) 1.5px, transparent 1.5px);
+            background-size: 190px 190px;
+            background-position: 45px 85px;
+            opacity: 0.4;
+            animation: cosmicFloat2 35s ease-in-out infinite alternate, cosmicRotate 80s linear infinite reverse;
+        }
+
+        /* 自転をかけるアニメーション */
+        @keyframes cosmicRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 不規則な浮遊（うねり）を作るアニメーション1 */
+        @keyframes cosmicFloat1 {
+            0% { translate: 0px 0px; }
+            33% { translate: 40px -60px; }
+            66% { translate: -50px 30px; }
+            100% { translate: 30px 50px; }
+        }
+
+        /* 不規則な浮遊（うねり）を作るアニメーション2 */
+        @keyframes cosmicFloat2 {
+            0% { translate: 0px 0px; }
+            50% { translate: -60px -40px; }
+            100% { translate: 50px -20px; }
+        }
+
+        h1 {
             color: #fff;
-            font-size: 15px;
-            transition: 0.3s;
+            text-shadow: 0 0 15px var(--cosmic-blue);
+            font-size: 26px;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            font-weight: 500;
+            z-index: 1;
         }
-        input[type="text"]:focus {
+
+        .main-panel {
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 25px;
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+            backdrop-filter: blur(8px);
+            z-index: 1;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #a2b4f0;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 12px;
+            color: #fff;
+            box-sizing: border-box;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
             outline: none;
-            border-color: #38bdf8;
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+            border-color: var(--cosmic-blue);
+            background: rgba(0, 0, 0, 0.8);
         }
 
-        button.add-btn { 
-            width: 100%; 
-            padding: 14px; 
-            background: linear-gradient(135deg, #38bdf8, #3b82f6); 
-            color: white; 
-            border: none; 
-            border-radius: 6px; 
-            font-size: 16px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            transition: 0.3s;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-        button.add-btn:hover { 
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--cosmic-blue), var(--nebula-purple));
+            border: none;
+            color: #fff;
+            padding: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            transition: opacity 0.2s;
+            border-radius: 6px;
         }
 
-        ul { list-style: none; padding: 0; margin-top: 25px; }
+        button:hover {
+            opacity: 0.9;
+        }
 
-        .fav-item {
-            margin-bottom: 12px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background: rgba(255, 255, 255, 0.05); 
-            padding: 12px 15px; 
-            border-radius: 6px; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            backdrop-filter: blur(5px); 
-            transition: 0.2s;
+        .link-container {
+            margin-top: 25px;
+            width: 100%;
+            max-width: 500px;
+            z-index: 1;
         }
-        .fav-link {
-            color: #64ffda; 
-            text-decoration: none; 
-            font-weight: bold; 
-            letter-spacing: 0.5px;
+
+        .link-card {
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(8px);
         }
-        .fav-url {
-            font-weight: normal; 
-            color: #8892b0; 
-            font-size: 0.85em; 
-            display: block; 
-            margin-top: 2px;
+
+        .link-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(18, 25, 48, 0.9);
         }
+
+        .link-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-width: 75%;
+            overflow: hidden;
+        }
+
+        .link-anchor {
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .link-anchor:hover {
+            text-decoration: underline;
+            color: var(--cosmic-blue);
+        }
+
+        .link-url-sub {
+            color: var(--url-color);
+            font-size: 12px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         .delete-btn {
-            background-color: rgba(244, 63, 94, 0.15); 
-            color: #f43f5e; 
-            border: 1px solid #f43f5e; 
-            padding: 6px 12px; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-size: 12px; 
-            font-weight: bold; 
-            transition: 0.2s;
+            background: transparent;
+            border: 1px solid var(--alert-red);
+            color: var(--alert-red);
+            width: auto;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
+
         .delete-btn:hover {
-            background: #f43f5e;
+            background: var(--alert-red);
             color: #fff;
         }
     </style>
 </head>
 <body>
 
-    <canvas id="starfield"></canvas>
+    <h1>Screen Time Bypass</h1>
 
-    <div class="container">
-        <h1>時間制限を超えた時に表示されるやつのみをバイパスできます。使い方はリンクを押す→ブロックされる→戻る→リンクを押すです。</h1>
+    <div class="main-panel">
+        <form id="urlForm">
+            <div class="form-group">
+                <label>サイト名（タイトル）</label>
+                <input type="text" id="titleInput" placeholder="例: Google" required>
+            </div>
+            <div class="form-group">
+                <label>URL</label>
+                <input type="url" id="urlInput" placeholder="https://..." required>
+            </div>
+            <button type="submit">URLを登録する</button>
+        </form>
+    </div>
 
-        <input type="text" id="favTitle" placeholder="サイト名（例: Google）">
-        <input type="text" id="favUrl" placeholder="URL" value="https://">
-        <button class="add-btn" onclick="addFavorite()">url</button>
-        
-        <ul id="favoriteList">
-            <!-- ここにJavaScriptで動的にお気に入りが追加されます -->
-        </ul>
+    <div class="link-container" id="linkList">
+        <!-- 登録されたURLがここに動的生成されます -->
     </div>
 
     <script>
-        // --- 星の背景エフェクト ---
-        const canvas = document.getElementById('starfield');
-        const ctx = canvas.getContext('2d');
-        let numStars = 100; 
-        let stars = [];
-        
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        const urlForm = document.getElementById('urlForm');
+        const linkList = document.getElementById('linkList');
 
-        for (let i = 0; i < numStars; i++) {
-            stars.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: Math.random() * 1.5 + 0.5, 
-                speed: Math.random() * 0.5 + 0.1 
+        async function fetchUrls() {
+            linkList.innerHTML = '';
+            const res = await fetch('/api/urls');
+            const urls = await res.json();
+            
+            urls.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'link-card';
+                
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'link-info';
+
+                const anchor = document.createElement('a');
+                anchor.className = 'link-anchor';
+                anchor.href = item.url;
+                anchor.target = '_blank';
+                anchor.textContent = item.name;
+                
+                const urlSub = document.createElement('div');
+                urlSub.className = 'link-url-sub';
+                urlSub.textContent = item.url;
+
+                infoDiv.appendChild(anchor);
+                infoDiv.appendChild(urlSub);
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = '削除';
+                deleteBtn.onclick = () => deleteUrl(item.id);
+                
+                card.appendChild(infoDiv);
+                card.appendChild(deleteBtn);
+                linkList.appendChild(card);
             });
         }
 
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'; 
-            stars.forEach(star => {
-                ctx.beginPath();
-                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-                ctx.fill();
-                star.x -= star.speed;
-                star.y += star.speed * 0.5;
-                if (star.x < 0) { star.x = canvas.width; star.y = Math.random() * canvas.height; }
-                if (star.y > canvas.height) { star.y = 0; star.x = Math.random() * canvas.width; }
-            });
-            requestAnimationFrame(animate);
-        }
-        animate();
+        urlForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('titleInput').value;
+            const url = document.getElementById('urlInput').value;
 
-        // --- API連携処理 ---
-        // 起動時にデータを取得して描画する
-        async function fetchFavorites() {
-            const res = await fetch('/api/favorites');
-            const favorites = await res.json();
-            const listEl = document.getElementById('favoriteList');
-            
-            listEl.innerHTML = favorites.map(fav => `
-                <li class="fav-item">
-                    <a href="${fav.url}" target="_blank" class="fav-link">
-                        ${fav.title} <span class="fav-url">${fav.url}</span>
-                    </a>
-                    <button onclick="deleteFavorite(${fav.id})" class="delete-btn">削除</button>
-                </li>
-            `).join('');
-        }
-
-        // 追加処理
-        async function addFavorite() {
-            const title = document.getElementById('favTitle').value.trim();
-            const url = document.getElementById('favUrl').value.trim();
-            
-            if (!title || url === "https://") {
-                alert('サイト名とURLを入力してください。');
-                return;
-            }
-
-            await fetch('/api/favorites', {
+            await fetch('/api/urls', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, url })
+                body: JSON.stringify({ name, url })
             });
-            
-            // 入力欄をクリアして再読込
-            document.getElementById('favTitle').value = '';
-            document.getElementById('favUrl').value = 'https://';
-            fetchFavorites();
+
+            urlForm.reset();
+            fetchUrls();
+        });
+
+        async function deleteUrl(id) {
+            await fetch(`/api/urls/${id}`, { method: 'DELETE' });
+            fetchUrls();
         }
 
-        // 削除処理
-        async function deleteFavorite(id) {
-            await fetch('/api/favorites/' + id, { method: 'DELETE' });
-            fetchFavorites();
-        }
-
-        // 初期読み込みを実行
-        fetchFavorites();
+        fetchUrls();
     </script>
 </body>
 </html>

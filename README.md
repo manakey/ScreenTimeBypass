@@ -1,1 +1,4 @@
 # ScreenTimeBypass
+これは素人がaiに作らせたappleのScreen Timeを突破するものです。
+使い方はURLを登録してそれをクリック→ブロックされる→戻ってもう一回押す
+です
